@@ -47,7 +47,7 @@ jobs:
             [
               'main',
               {
-                name: '${{ github.head_ref }}',
+                name: '${{ github.ref_name }}',
                 prerelease: true
               }
             ]
