@@ -6,6 +6,8 @@ on:
       - main
     tags:
       - 'v*.*.*'
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   release:
@@ -36,9 +38,10 @@ jobs:
 
       - name: Semantic Release
         id: semantic
+        if: ${{ github.event_name == 'push' }}
         uses: cycjimmy/semantic-release-action@v4
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
         if: steps.semantic.outputs.new_release_published == 'true'
@@ -63,3 +66,36 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}:latest
             ghcr.io/${{ github.repository }}:${{ steps.semantic.outputs.new_release_version }}
+
+      # New steps for pull_request events
+      - name: Simulate Semantic Release
+        id: simulation
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          OUTPUT=$(npx semantic-release --dry-run)
+          echo "simulation_result<<EOF" >> $GITHUB_OUTPUT
+          echo "$OUTPUT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Comment Semantic Release Simulation Results
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            **Semantic Release Simulation Result**
+            Release Output:
+            ```
+            ${{ steps.simulation.outputs.simulation_result }}
+            ```
+
+      - name: Build and Push Docker Review Image
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          build-args: |
+            NODE_VERSION=${{ steps.get_node_version.outputs.version }}
+          tags: |
+            ghcr.io/${{ github.repository }}:review-${{ github.head_ref }}
