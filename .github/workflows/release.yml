@@ -74,4 +74,4 @@ jobs:
           build-args: |
             NODE_VERSION=${{ steps.get_node_version.outputs.version }}
           tags: |
-            ghcr.io/${{ github.repository }}:review-${{ github.ref_name }}
+            ghcr.io/${{ github.repository }}:review-${{ github.ref_name }}-${{ github.sha }}
