@@ -7,11 +7,6 @@ on:
     tags:
       - 'v*.*.*'
 
-# Add workflow-level permissions
-permissions:
-  contents: write
-  packages: write
-
 jobs:
   semantic_release:
     if: startsWith(github.ref, 'refs/heads/')

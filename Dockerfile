@@ -8,7 +8,6 @@ WORKDIR /app
 # Copy configuration files first
 COPY mise.toml ./
 COPY package*.json ./
-COPY .npmrc ./
 
 # Install dependencies
 RUN npm ci
