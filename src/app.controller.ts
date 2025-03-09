@@ -9,4 +9,14 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+
+  @Get('space-fact')
+  getSpaceFact() {
+    return this.appService.getSpaceFact();
+  }
+
+  @Get('demo')
+  getCoolDemo() {
+    return this.appService.getCoolDemoData();
+  }
 }
