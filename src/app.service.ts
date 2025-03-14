@@ -5,4 +5,8 @@ export class AppService {
   getHello(): string {
     return 'Hello feat-1!';
   }
+
+  getLive(): string {
+    return 'Hello Bryan and Matheus!';
+  }
 }
